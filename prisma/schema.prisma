@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt() @map("updated_at")
+
+  name     String
+  email    String @unique
+  password String
+
+  balance        Int
+  isAdmin        Boolean          @default(false) @map("is_admin")
+  cars           Car[]
+  parkingHistory ParkingHistory[]
+}
+
+model Car {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt() @map("updated_at")
+
+  name String
+
+  serialNumber String @map("serial_number")
+
+  type String @default("sedan")
+
+  user           User?            @relation(fields: [userId], references: [id])
+  userId         Int?             @map("user_id")
+  ParkingHistory ParkingHistory[]
+  CronJob        CronJob[]
+}
+
+model ParkingHistory {
+  id            Int         @id @default(autoincrement())
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt() @map("updated_at")
+  car           Car         @relation(fields: [carId], references: [id])
+  carId         Int
+  parking       ParkingZone @relation(fields: [parkingZoneId], references: [id])
+  parkingZoneId Int
+  isActive      Boolean
+  user          User?       @relation(fields: [userId], references: [id])
+  userId        Int?
+}
+
+model ParkingZone {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt() @map("updated_at")
+
+  name String @unique
+
+  address String
+
+  price          Int
+  ParkingHistory ParkingHistory[]
+}
+
+model CronJob {
+  id    Int    @id @default(autoincrement())
+  name  String
+  car   Car    @relation(fields: [carId], references: [id])
+  carId Int    @unique
+}
