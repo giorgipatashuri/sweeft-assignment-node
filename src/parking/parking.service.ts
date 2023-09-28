@@ -48,7 +48,7 @@ export class ParkingService {
         },
       });
 
-      const cronJob = new CronJob('45 * * * * *', () =>
+      const cronJob = new CronJob('*/60 * * * * *', () =>
         this.handleCron(userId, parking.parking.price, cronJobName),
       );
       this.schedulerRegistry.addCronJob(cronJobName, cronJob);
